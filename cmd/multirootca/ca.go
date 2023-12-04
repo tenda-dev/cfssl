@@ -17,6 +17,7 @@ import (
 	"github.com/cloudflare/cfssl/signer/local"
 	"github.com/cloudflare/cfssl/whitelist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/letsencrypt/pkcs11key/v4"
 
 	_ "github.com/go-sql-driver/mysql" // import to support MySQL
 	_ "github.com/lib/pq"              // import to support Postgres
@@ -26,7 +27,7 @@ import (
 func parseSigner(root *config.Root) (signer.Signer, error) {
 	privateKey := root.PrivateKey
 	switch priv := privateKey.(type) {
-	case *rsa.PrivateKey, *ecdsa.PrivateKey, ed25519.PrivateKey:
+	case *rsa.PrivateKey, *ecdsa.PrivateKey, ed25519.PrivateKey, *pkcs11key.Key:
 		s, err := local.NewSigner(priv, root.Certificate, signer.DefaultSigAlgo(priv), nil)
 		if err != nil {
 			return nil, err
