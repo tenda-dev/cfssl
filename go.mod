@@ -11,6 +11,8 @@ require (
 	github.com/jmhodges/clock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kisielk/sqlstruct v0.0.0-20201105191214-5f3e10d3ab46
+	github.com/letsencrypt/pkcs11key v4.0.0+incompatible
+	github.com/letsencrypt/pkcs11key/v4 v4.0.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/prometheus/client_golang v1.19.0
@@ -26,6 +28,11 @@ require (
 	github.com/getsentry/sentry-go v0.11.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/kylelemons/go-gypsy v1.0.0 // indirect
+<<<<<<< HEAD
+=======
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+	github.com/miekg/pkcs11 v1.1.1 // indirect
+>>>>>>> 1020c46e (Added Multirootca PKCS11# Support)
 	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
