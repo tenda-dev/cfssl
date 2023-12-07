@@ -37,6 +37,7 @@ func prepDB() (certdb.Accessor, error) {
 		AKI:    fakeAKI,
 		Expiry: expirationTime,
 		PEM:    "unexpired cert",
+		Subject: "/C=PL/CN=Test",
 	}
 
 	dbAccessor := sql.NewAccessor(db)
