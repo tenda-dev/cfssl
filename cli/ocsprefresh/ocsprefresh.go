@@ -60,16 +60,16 @@ func ocsprefreshMain(args []string, c cli.Config) error {
 		return err
 	}
 
-    log.Debug("Loading issuer cert: ", c.CAFile)
-    issuerBytes, err := ioutil.ReadFile(c.CAFile)
-    if err != nil {
-        return nil
-    }
+        log.Debug("Loading issuer cert: ", c.CAFile)
+        issuerBytes, err := ioutil.ReadFile(c.CAFile)
+        if err != nil {
+		return nil
+        }
 
-    issuerCert, err := helpers.ParseCertificatePEM([]byte(issuerBytes))
-    if err != nil {
-        return nil
-    }
+        issuerCert, err := helpers.ParseCertificatePEM([]byte(issuerBytes))
+        if err != nil {
+		return nil
+        }
 
 	dbAccessor := sql.NewAccessor(db)
 
