@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 	"time"
+	"io/ioutil"
 
 	"github.com/cloudflare/cfssl/certdb"
 	"github.com/cloudflare/cfssl/certdb/sql"
@@ -31,6 +32,7 @@ func TestOCSPRefreshMain(t *testing.T) {
 	expirationTime := time.Now().AddDate(1, 0, 0)
 	certRecord := certdb.CertificateRecord{
 		Serial: cert.SerialNumber.String(),
+		Subject: cert.Subject.String(),
 		AKI:    hex.EncodeToString(cert.AuthorityKeyId),
 		Expiry: expirationTime,
 		PEM:    string(certPEM),
