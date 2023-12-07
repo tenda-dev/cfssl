@@ -14,6 +14,7 @@ import (
 var dbAccessor certdb.Accessor
 
 const (
+	fakeSubject = "C=PL/CN=Test"
 	fakeAKI = "fake aki"
 )
 
@@ -22,6 +23,7 @@ func prepDB() (err error) {
 	expirationTime := time.Now().AddDate(1, 0, 0)
 	var cert = certdb.CertificateRecord{
 		Serial: "1",
+		Subject: fakeSubject,
 		AKI:    fakeAKI,
 		Expiry: expirationTime,
 		PEM:    "unexpired cert",
