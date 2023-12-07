@@ -18,13 +18,18 @@ type CertificateRecord struct {
 	Reason    int       `db:"reason"`
 	Expiry    time.Time `db:"expiry"`
 	RevokedAt time.Time `db:"revoked_at"`
+	CreatedAt time.Time `db:"created_at"`
 	PEM       string    `db:"pem"`
+	Subject   string    `db:"subject"`
+	CAProfile string    `db:"ca_profile"`
+	Request   string    `db:"request"`
 	// the following fields will be empty for data inserted before migrate 002 has been run.
 	IssuedAt     *time.Time     `db:"issued_at"`
 	NotBefore    *time.Time     `db:"not_before"`
 	MetadataJSON types.JSONText `db:"metadata"`
 	SANsJSON     types.JSONText `db:"sans"`
 	CommonName   sql.NullString `db:"common_name"`
+	
 }
 
 // SetMetadata sets the metadata json
