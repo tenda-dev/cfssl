@@ -2,31 +2,34 @@
 package ocsprefresh
 
 import (
+	"crypto/sha1"
 	"encoding/hex"
 	"errors"
 	"time"
 	"io/ioutil"
 
+	"github.com/cloudflare/cfssl/certdb"
 	"github.com/cloudflare/cfssl/certdb/dbconf"
 	"github.com/cloudflare/cfssl/certdb/sql"
 	"github.com/cloudflare/cfssl/cli"
 	"github.com/cloudflare/cfssl/helpers"
 	"github.com/cloudflare/cfssl/log"
 	"github.com/cloudflare/cfssl/ocsp"
+	"github.com/gomodule/redigo/redis"
 )
 
 // Usage text of 'cfssl ocsprefresh'
 var ocsprefreshUsageText = `cfssl ocsprefresh -- refreshes the ocsp_responses table
-with new OCSP responses for all known unexpired certificates
+with new OCSP responses for all known unexpired certificates (with recently changed only as option).
 
 Usage of ocsprefresh:
-        cfssl ocsprefresh -db-config db-config -ca cert -responder cert -responder-key key [-interval 96h]
+        cfssl ocsprefresh -db-config db-config -ca cert -responder cert -responder-key key [-interval 96h] [-recent-changes-only 5min] [-redis host:port]
 
 Flags:
 `
 
 // Flags of 'cfssl ocsprefresh'
-var ocsprefreshFlags = []string{"ca", "responder", "responder-key", "db-config", "interval"}
+var ocsprefreshFlags = []string{"ca", "responder", "responder-key", "db-config", "interval", "recent-changes-only", "redis"}
 
 // ocsprefreshMain is the main CLI of OCSP refresh functionality.
 func ocsprefreshMain(args []string, c cli.Config) error {
@@ -63,15 +66,43 @@ func ocsprefreshMain(args []string, c cli.Config) error {
         return nil
     }
 
-	issuerCert, err := helpers.ParseCertificatePEM([]byte(issuerBytes))
+    issuerCert, err := helpers.ParseCertificatePEM([]byte(issuerBytes))
     if err != nil {
         return nil
     }
 
 	dbAccessor := sql.NewAccessor(db)
-	certs, err := dbAccessor.GetUnexpiredCertificates(hex.EncodeToString(issuerCert.SubjectKeyId))
-	if err != nil {
-		return err
+
+	var certs []certdb.CertificateRecord
+
+	if c.RecentChangesOnly != 0 {
+		oldestChangeTimestamp := time.Now().Add(-c.RecentChangesOnly).UTC()
+		certs, err := dbAccessor.GetUnexpiredCertificatesRecentChangesOnlyByAKI(hex.EncodeToString(issuerCert.SubjectKeyId), oldestChangeTimestamp)
+		if err != nil {
+			return err
+		}
+	} else {
+		certs, err := dbAccessor.GetUnexpiredCertificates(hex.EncodeToString(issuerCert.SubjectKeyId))
+		if err != nil {
+			return err
+		}
+	}
+
+	// Open connection to redis service if redis flag present.
+	var redisConn redis.Conn
+	if c.Redis != "" {
+		dialOptions := []redis.DialOption{
+			redis.DialReadTimeout(time.Duration(10) * time.Second),
+			redis.DialWriteTimeout(time.Duration(10) * time.Second),
+			redis.DialConnectTimeout(time.Duration(30) * time.Second),
+		}
+
+		if redisConn, err = redis.Dial("tcp", c.Redis, dialOptions...); err != nil {
+			log.Critical("Unable to connect to redis service: ", err)
+			return err
+		}
+
+		defer redisConn.Close()
 	}
 
 	// Set an expiry timestamp for all certificates refreshed in this batch
@@ -99,10 +130,20 @@ func ocsprefreshMain(args []string, c cli.Config) error {
 			return err
 		}
 
-		err = dbAccessor.UpsertOCSP(cert.SerialNumber.String(), hex.EncodeToString(cert.AuthorityKeyId), string(resp), ocspExpiry)
-		if err != nil {
-			log.Critical("Unable to save OCSP response: ", err)
-			return err
+	// Store signed response in redis if enabled; store in SQL db otherwise.
+		if redisConn != nil {
+			// Use sha1 of cert AKI+SerialNumber for smaller and faster keys in redis; set
+			// item expiry in redis (in seconds) same as for OCSP response.
+			if _, err := redisConn.Do("SET", sha1.Sum(append(cert.AuthorityKeyId, cert.SerialNumber.Bytes()...)), resp, "EX", int(c.Interval.Seconds())); err != nil {
+				log.Critical("Unable to save OCSP response in redis: ", err)
+				return err
+			}
+		} else {
+			err = dbAccessor.UpsertOCSP(cert.SerialNumber.String(), hex.EncodeToString(cert.AuthorityKeyId), string(resp), ocspExpiry)
+			if err != nil {
+				log.Critical("Unable to save OCSP response in SQL database: ", err)
+				return err
+			}
 		}
 	}
 
