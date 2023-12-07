@@ -13,6 +13,7 @@ import (
 	"database/sql"
 	"encoding/asn1"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -506,17 +507,26 @@ func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) {
 	// AuthorityKeyId of certTBS.
 	parsedCert, _ := helpers.ParseCertificatePEM(signedCert)
 
+	// Create JSON req representation for saving in DB.
+	var reqJSON []byte
+	if reqJSON, err = json.Marshal(req); err != nil {
+		return nil, err
+	}
+
 	if s.dbAccessor != nil {
 		now := time.Now()
 		var certRecord = certdb.CertificateRecord{
 			Serial: certTBS.SerialNumber.String(),
+			Subject: certTBS.Subject.String(),
 			// this relies on the specific behavior of x509.CreateCertificate
 			// which sets the AuthorityKeyId from the signer's SubjectKeyId
 			AKI:        hex.EncodeToString(parsedCert.AuthorityKeyId),
 			CALabel:    req.Label,
+			CAProfile: req.Profile,
 			Status:     "good",
 			Expiry:     certTBS.NotAfter,
 			PEM:        string(signedCert),
+			Request:   string(reqJSON),
 			IssuedAt:   &now,
 			NotBefore:  &certTBS.NotBefore,
 			CommonName: sql.NullString{String: certTBS.Subject.CommonName, Valid: true},
