@@ -62,6 +62,9 @@ type AddRequest struct {
 	MetadataJSON types.JSONText `json:"metadata"`
 	SansJSON     types.JSONText `json:"sans"`
 	CommonName   string         `json:"common_name"`
+	Subject      string	    `json:"subject"`
+	CAProfile    string    	    `json:"ca_profile"`
+	Request      string	    `json:"request"`
 }
 
 // Map of valid reason codes
@@ -165,6 +168,9 @@ func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) error {
 		MetadataJSON: req.MetadataJSON,
 		SANsJSON:     req.SansJSON,
 		CommonName:   sql.NullString{String: req.CommonName, Valid: req.CommonName != ""},
+		Subject:      req.Subject,
+		CAProfile:    req.CAProfile,
+		Request:      req.Request,
 	}
 
 	err = h.dbAccessor.InsertCertificate(cr)
