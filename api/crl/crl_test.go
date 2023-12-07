@@ -34,6 +34,7 @@ func prepDB() (certdb.Accessor, error) {
 		Status:    "revoked",
 		RevokedAt: time.Now(),
 		Reason:    4,
+		Subject:   "/C=PL/CN=Test",
 	}
 
 	dbAccessor := sql.NewAccessor(db)
