@@ -77,15 +77,17 @@ func ocsprefreshMain(args []string, c cli.Config) error {
 
 	if c.RecentChangesOnly != 0 {
 		oldestChangeTimestamp := time.Now().Add(-c.RecentChangesOnly).UTC()
-		certs, err := dbAccessor.GetUnexpiredCertificatesRecentChangesOnlyByAKI(hex.EncodeToString(issuerCert.SubjectKeyId), oldestChangeTimestamp)
+		c, err := dbAccessor.GetUnexpiredCertificatesRecentChangesOnlyByAKI(hex.EncodeToString(issuerCert.SubjectKeyId), oldestChangeTimestamp)
 		if err != nil {
 			return err
 		}
+		certs = c
 	} else {
-		certs, err := dbAccessor.GetUnexpiredCertificates(hex.EncodeToString(issuerCert.SubjectKeyId))
+		c, err := dbAccessor.GetUnexpiredCertificates(hex.EncodeToString(issuerCert.SubjectKeyId))
 		if err != nil {
 			return err
 		}
+		certs = c
 	}
 
 	// Open connection to redis service if redis flag present.
