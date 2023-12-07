@@ -39,6 +39,9 @@ github.com/go-logr/logr
 # github.com/go-sql-driver/mysql v1.7.1
 ## explicit; go 1.13
 github.com/go-sql-driver/mysql
+# github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38
+## explicit
+github.com/gomodule/redigo/redis
 # github.com/google/certificate-transparency-go v1.1.7
 ## explicit; go 1.20
 github.com/google/certificate-transparency-go

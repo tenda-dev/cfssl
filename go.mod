@@ -7,6 +7,7 @@ require (
 	github.com/cloudflare/backoff v0.0.0-20161212185259-647f3cdfc87a
 	github.com/cloudflare/redoctober v0.0.0-20211013234631-6a74ccc611f6
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38
 	github.com/google/certificate-transparency-go v1.1.7
 	github.com/jmhodges/clock v1.2.0
 	github.com/jmoiron/sqlx v1.3.5
