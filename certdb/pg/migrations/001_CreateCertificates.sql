@@ -25,7 +25,8 @@ IF NOT EXISTS (
     ) THEN
     CREATE INDEX certificates_created_at ON certificates (created_at);
 END IF;
-END $$;
+END;
+$$
 ;
 DO $$
 BEGIN
@@ -36,7 +37,8 @@ IF NOT EXISTS (
     ) THEN
     CREATE INDEX certificates_revoked_at ON certificates (revoked_at);
 END IF;
-END $$;
+END;
+$$
 ;
 
 CREATE TABLE ocsp_responses (
