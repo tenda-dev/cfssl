@@ -16,6 +16,7 @@ CREATE TABLE certificates (
   request                  bytea,
   PRIMARY KEY(serial_number, authority_key_identifier)
 );
+-- +goose StatementBegin
 DO $$
 BEGIN
 IF NOT EXISTS (
@@ -25,8 +26,7 @@ IF NOT EXISTS (
     ) THEN
     CREATE INDEX certificates_created_at ON certificates (created_at);
 END IF;
-END;
-$$
+END$$;
 ;
 DO $$
 BEGIN
@@ -37,10 +37,9 @@ IF NOT EXISTS (
     ) THEN
     CREATE INDEX certificates_revoked_at ON certificates (revoked_at);
 END IF;
-END;
-$$
+END$$;
 ;
-
+-- +goose StatementEnd
 CREATE TABLE ocsp_responses (
   serial_number            bytea NOT NULL,
   authority_key_identifier bytea NOT NULL,
