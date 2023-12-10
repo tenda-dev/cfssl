@@ -16,27 +16,31 @@ CREATE TABLE certificates (
   request                  bytea,
   PRIMARY KEY(serial_number, authority_key_identifier)
 );
-DO $$
-BEGIN
-IF NOT EXISTS (
-    SELECT 1
-    FROM pg_indexes
-    WHERE LOWER(indexname) = LOWER('certificates_created_at')
-    ) THEN
-    CREATE INDEX certificates_created_at ON certificates (created_at);
-END IF;
-END$$;
+DO 
+  '
+  BEGIN
+  IF NOT EXISTS (
+      SELECT 1
+      FROM pg_indexes
+      WHERE LOWER(indexname) = LOWER('certificates_created_at')
+      ) THEN
+      CREATE INDEX certificates_created_at ON certificates (created_at);
+  END IF;
+  END;
+  '  
 ;
-DO $$
-BEGIN
-IF NOT EXISTS (
-    SELECT 1
-    FROM pg_indexes
-    WHERE LOWER(indexname) = LOWER('certificates_revoked_at')
-    ) THEN
-    CREATE INDEX certificates_revoked_at ON certificates (revoked_at);
-END IF;
-END$$;
+DO
+  '
+  BEGIN
+  IF NOT EXISTS (
+      SELECT 1
+      FROM pg_indexes
+      WHERE LOWER(indexname) = LOWER('certificates_revoked_at')
+      ) THEN
+      CREATE INDEX certificates_revoked_at ON certificates (revoked_at);
+  END IF;
+  END;
+  '
 ;
 
 CREATE TABLE ocsp_responses (
