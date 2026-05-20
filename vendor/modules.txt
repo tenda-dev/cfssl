@@ -43,16 +43,11 @@ github.com/go-logr/logr
 # github.com/go-sql-driver/mysql v1.8.0
 ## explicit; go 1.18
 github.com/go-sql-driver/mysql
-<<<<<<< HEAD
-# github.com/google/certificate-transparency-go v1.1.8
-## explicit; go 1.21
-=======
 # github.com/gomodule/redigo v1.7.1-0.20190724094224-574c33c3df38
 ## explicit
 github.com/gomodule/redigo/redis
-# github.com/google/certificate-transparency-go v1.1.7
-## explicit; go 1.20
->>>>>>> 166fdd6e (Add cert search and ocsp redis support)
+# github.com/google/certificate-transparency-go v1.1.8
+## explicit; go 1.21
 github.com/google/certificate-transparency-go
 github.com/google/certificate-transparency-go/asn1
 github.com/google/certificate-transparency-go/client
@@ -88,14 +83,10 @@ github.com/lib/pq/oid
 github.com/lib/pq/scram
 # github.com/mattn/go-sqlite3 v1.14.22
 ## explicit; go 1.19
-<<<<<<< HEAD
 github.com/mattn/go-sqlite3
-=======
-github.com/matttproud/golang_protobuf_extensions/v2/pbutil
 # github.com/miekg/pkcs11 v1.1.1
 ## explicit; go 1.12
 github.com/miekg/pkcs11
->>>>>>> 1020c46e (Added Multirootca PKCS11# Support)
 # github.com/pelletier/go-toml v1.9.3
 ## explicit; go 1.12
 github.com/pelletier/go-toml
